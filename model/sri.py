@@ -1,0 +1,2 @@
+class SRI:
+    pass
