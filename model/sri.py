@@ -20,7 +20,9 @@ class SIRModel():
 
 
     def predict(self, t):
-
+        S=0
+        I=0
+        R=0
         return S, I, R
 
 
