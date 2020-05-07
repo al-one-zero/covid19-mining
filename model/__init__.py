@@ -1,1 +1,1 @@
-from sri import SRI
+from .sri import SRI
