@@ -24,17 +24,15 @@ class SIRModel(BaseModel):
         dRdt = gamma * I
         return dSdt, dIdt, dRdt
 
-    def fit(self,t, N,I,R):
-        y=np.hstack((I,R))
+    def fit(self,t, N,I):
+        y=np.hstack((I))
         I0=I[0]
-        R0=R[0]
-        S0=N-I0-R0
-        y_0=(S0,I0,R0)
+        S0=N-I0
+        y_0=(S0,I0,0)
         def f(t,*params):
             y_t=self._predict(t,y_0,params)
             I_pred=y_t[1]
-            R_pred=y_t[2]
-            pred=np.hstack((I_pred,R_pred))
+            pred=np.hstack((I_pred))
             return pred
         self._curve_fit(f,t,y)
         return self
