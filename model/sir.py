@@ -1,5 +1,5 @@
 import numpy as np
-from BaseModel import BaseModel
+from .base import BaseModel
 
 class SIRModel(BaseModel):
     def __init__(self, beta:float=0.1, gamma:float=0.2):
@@ -16,7 +16,7 @@ class SIRModel(BaseModel):
 
     def _update_params(self,new_params):
         self.beta_,self.gamma_=new_params
-    
+
     def deriv(self,t,S,I,R,beta,gamma):
         N=S+I+R
         dSdt = -beta * S * I / N
