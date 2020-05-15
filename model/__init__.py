@@ -1,1 +1,2 @@
-from .sri import SRI
+from .base import BaseModel
+from .sir import SIRModel
