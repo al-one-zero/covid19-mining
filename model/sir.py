@@ -1,10 +1,12 @@
 import numpy as np
+from pandas import DataFrame
 from .base import BaseModel
 
 class SIRModel(BaseModel):
-    def __init__(self, beta:float=0.1, gamma:float=0.2):
+    def __init__(self, N=None, beta:float=0.1, gamma:float=0.2):
         self.beta_ = beta
         self.gamma_ = gamma
+        self.N_ = N
 
     @property
     def params(self):
@@ -17,25 +19,50 @@ class SIRModel(BaseModel):
     def _update_params(self,new_params):
         self.beta_,self.gamma_=new_params
 
-    def deriv(self,t,S,I,R,beta,gamma):
-        N=S+I+R
+    def deriv(self, t, y, beta, gamma):
+        N = self.N_ = sum(y)
+        S, I, R = y
         dSdt = -beta * S * I / N
         dIdt = beta * S * I / N - gamma * I
         dRdt = gamma * I
         return dSdt, dIdt, dRdt
 
-    def fit(self,t, N,I):
-        y=np.hstack((I))
-        I0=I[0]
-        S0=N-I0
-        y_0=(S0,I0,0)
+    def fit(self, t, y, N=None):
+        if N is None:
+            self.N_ = N
+        if isinstance(y, list):
+            S, I, R = y
+            I0=I[0]
+            if len(S)>0:
+                S0 = S[0]
+            else:
+                S0 = S
+            if len(R) > 0:
+                R0=R[0]
+            else:
+                R0 = R
+            y_0=(S0,I0,R0)
+        elif isinstance(y, DataFrame):
+            y=y.values
+            y_0 = y.iloc[0].values
+        elif isinstance(y, np.ndarray):
+            S, I, R = y
+            I0=I[0]
+            if len(S)>0:
+                S0 = S[0]
+            else:
+                S0 = S
+            if len(R) > 0:
+                R0=R[0]
+            else:
+                R0 = R
+            y_0=(S0,I0,R0)
+        else:
+            raise ValueError
+        y_s = np.hstack(y)
         def f(t,*params):
             y_t=self._predict(t,y_0,params)
-            I_pred=y_t[1]
-            pred=np.hstack((I_pred))
+            pred=np.hstack(y_t)
             return pred
-        self._curve_fit(f,t,y)
+        self._curve_fit(f,t,y_s)
         return self
-
-
-

@@ -7,6 +7,10 @@ class BaseModel():
         self.params=None
         self.params_cov_=None
 
+    def __str__(self):
+        s = [f'{p=}' for p in self.params]
+        return ' ; '.join(s)
+
     def deriv(self,*args):
         raise NotImplemented
 
@@ -21,7 +25,7 @@ class BaseModel():
 
     def _integrate(self,t,y_0,params):
         t_span=(min(t),max(t))
-        deriv=lambda t,y: self.deriv(t,*y,*params)
+        deriv=lambda t,y: self.deriv(t,y,*params)
         ode_result=solve_ivp(deriv,t_span,y_0,t_eval=t)
         return ode_result
 
