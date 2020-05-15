@@ -1,3 +1,4 @@
-from . import SRI
+from . import SIRModel
+from . import SIERDModel
 
-sri = SRI()
+print('TODO : Write main')
