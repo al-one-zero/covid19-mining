@@ -27,42 +27,31 @@ class SIRModel(BaseModel):
         dRdt = gamma * I
         return dSdt, dIdt, dRdt
 
-    def fit(self, t, y, N=None):
-        if N is None:
-            self.N_ = N
+    def _check_input(self, y):
         if isinstance(y, list):
             S, I, R = y
             I0=I[0]
-            if len(S)>0:
-                S0 = S[0]
-            else:
-                S0 = S
-            if len(R) > 0:
-                R0=R[0]
-            else:
-                R0 = R
+            S0 = S
+            R0 = R
             y_0=(S0,I0,R0)
         elif isinstance(y, DataFrame):
             y=y.values
             y_0 = y.iloc[0].values
         elif isinstance(y, np.ndarray):
             S, I, R = y
-            I0=I[0]
-            if len(S)>0:
-                S0 = S[0]
-            else:
-                S0 = S
-            if len(R) > 0:
-                R0=R[0]
-            else:
-                R0 = R
-            y_0=(S0,I0,R0)
+            y_0=(S[0],I[0],R[0])
         else:
             raise ValueError
-        y_s = np.hstack(y)
+        return y, y_0
+
+    def fit(self, t, y, N=None):
+        if N is None:
+            self.N_ = N
+        y, y_0 = self._check_input(y)
+        y_s = np.hstack(y[1])
         def f(t,*params):
             y_t=self._predict(t,y_0,params)
-            pred=np.hstack(y_t)
+            pred=np.hstack(y_t[1])
             return pred
         self._curve_fit(f,t,y_s)
         return self

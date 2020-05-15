@@ -1,4 +1,4 @@
 from . import SIRModel
-from . import SIERDModel
+from . import SEIRModel
 
 print('TODO : Write main')

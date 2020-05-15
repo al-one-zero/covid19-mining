@@ -1,3 +1,5 @@
+import numpy as np
+from pandas import DataFrame
 from . import SIRModel as SIR
 
 class SEIRModel(SIR):
@@ -12,30 +14,47 @@ class SEIRModel(SIR):
 
     @params.setter
     def params(self, new_params):
-        self.beta_, self.gamma_, self.delta_ = new_params
+        self._update_params(*new_params)
 
-    def _update_params(self, *args):
-        self.params = args
+    def _update_params(self, args):
+        self.beta_, self.gamma_, self.delta_ = args
 
     def deriv(self, t, y, beta, gamma, delta):
-        N = sum(y)
+        self.N_ = N = sum(y)
         S, E, I, R = y
         dSdt = -beta * S * I / N
         dEdt = beta * S * I / N - delta * E
-        dIdt = beta * S * I / N - gamma * I
+        dIdt = delta * E - gamma * I
         dRdt = gamma * I
         return dSdt, dEdt, dIdt, dRdt
 
-    def fit(self, t, N, I, R):
-        self.N_ = N
-        y=np.hstack((I))
-        I0=I[0]
-        S0=N-I0
-        y_0=(S0,I0,0)
+    def _check_input(self, y):
+        if isinstance(y, list):
+            S, E, I, R = y
+            I0=I[0]
+            E0 = E[0]
+            S0 = S
+            R0 = R
+            y_0=(S0, E0, I0, R0)
+        elif isinstance(y, DataFrame):
+            y=y.values
+            y_0 = y.iloc[0].values
+        elif isinstance(y, np.ndarray):
+            S, E, I, R = y
+            y_0=(S[0],E[0],I[0],R[0])
+        else:
+            raise ValueError
+        return y, y_0
+
+
+    def fit(self, t, y, N=None):
+        if N is None:
+            self.N_ = N
+        y, y_0 = self._check_input(y)
+        y_s = np.hstack(y)
         def f(t,*params):
             y_t=self._predict(t,y_0,params)
-            I_pred=y_t[1]
-            pred=np.hstack((I_pred))
+            pred=np.hstack(y_t)
             return pred
-        self._curve_fit(f,t,y)
+        self._curve_fit(f,t,y_s)
         return self
