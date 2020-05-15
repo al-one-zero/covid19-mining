@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 from scipy.optimize import curve_fit
 from scipy.integrate import solve_ivp
 
