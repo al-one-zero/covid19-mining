@@ -5,11 +5,13 @@ from scipy.integrate import solve_ivp
 class BaseModel():
     def __init__(self):
         self.params=None
+        self.param_names = None
         self.params_cov_=None
 
     def __str__(self):
-        s = [f'{p=}' for p in self.params]
-        return ' ; '.join(s)
+        s = [f'{n}={p}' for p, n in zip(self.params, self.param_names)]
+        j = ",\n\t".join(s)
+        return f'{type(self).__name__}(\n\t{j}\n)'
 
     def deriv(self,*args):
         raise NotImplemented

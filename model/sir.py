@@ -7,6 +7,7 @@ class SIRModel(BaseModel):
         self.beta_ = beta
         self.gamma_ = gamma
         self.N_ = N
+        self.param_names = ['β', 'ɣ']
 
     @property
     def params(self):

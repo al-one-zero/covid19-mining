@@ -7,10 +7,11 @@ class SEIRModel(SIR):
     def __init__(self, delta=0.333, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.delta_ = delta
+        self.param_names.append('δ')
 
     @property
     def params(self):
-        return *super().params, self.delta_
+        return (*super().params, self.delta_)
 
     @params.setter
     def params(self, new_params):
@@ -32,7 +33,7 @@ class SEIRModel(SIR):
         if isinstance(y, list):
             S, E, I, R = y
             I0=I[0]
-            E0 = E[0]
+            E0 = E
             S0 = S
             R0 = R
             y_0=(S0, E0, I0, R0)
@@ -51,10 +52,10 @@ class SEIRModel(SIR):
         if N is None:
             self.N_ = N
         y, y_0 = self._check_input(y)
-        y_s = np.hstack(y)
+        y_s = np.hstack(y[2])
         def f(t,*params):
             y_t=self._predict(t,y_0,params)
-            pred=np.hstack(y_t)
+            pred=np.hstack(y_t[2])
             return pred
         self._curve_fit(f,t,y_s)
         return self
