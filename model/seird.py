@@ -19,7 +19,6 @@ class SEIRDModel(SEIR):
         self._update_params(*new_params)
     
     def _update_params(self, args):
-        print(args)
         super()._update_params(args[:-2])
         self.rho_, self.alpha_ = args[-2:]
 
