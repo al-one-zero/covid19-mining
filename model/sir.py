@@ -8,6 +8,9 @@ class SIRModel(BaseModel):
         self.gamma_ = gamma
         self.N_ = N
         self.param_names = ['β', 'ɣ']
+    
+    def __str__(self):
+        return super().__str__() + f'R0 = {self.R0:.4f}\n'
 
     @property
     def params(self):
@@ -16,6 +19,10 @@ class SIRModel(BaseModel):
     @params.setter
     def params(self,new_params):
         self.beta_,self.gamma_=new_params
+    
+    @property
+    def R0(self):
+        return self.beta_/self.gamma_
 
     def _update_params(self,new_params):
         self.beta_,self.gamma_=new_params

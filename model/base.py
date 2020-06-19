@@ -9,7 +9,15 @@ class BaseModel():
         self.params_cov_=None
 
     def __str__(self):
-        s = [f'{n}={p}' for p, n in zip(self.params, self.param_names)]
+        s = []
+        if self.params_cov_ is None:
+            s = [f'{n}={p:.4f}' for p, n in zip(self.params, self.param_names)]
+        else:
+            s = [f'{n} = {p:.4f} ± {v:.4f}'
+                    for p, n, v
+                    in zip(self.params,
+                           self.param_names,
+                           np.sqrt(np.diag(self.params_cov_)))]
         j = ",\n\t".join(s)
         return f'{type(self).__name__}(\n\t{j}\n)'
 
